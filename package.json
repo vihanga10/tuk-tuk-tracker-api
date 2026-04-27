@@ -1,0 +1,40 @@
+{
+  "name": "tuk-tuk-tracker-api",
+  "version": "1.0.0",
+  "description": "Sri Lanka Police Tuk-Tuk Tracking API Student ID : COBSCCOMP242P-039 Student Name : U D V Madushamini",
+  "type": "module",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "seed": "node seed/seedAll.js",
+    "simulate": "node simulation/generatePings.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vihanga10/tuk-tuk-tracker-api.git"
+  },
+  "keywords": [],
+  "author": "U D V Madushamini",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vihanga10/tuk-tuk-tracker-api/issues"
+  },
+  "homepage": "https://github.com/vihanga10/tuk-tuk-tracker-api#readme",
+  "dependencies": {
+    "@faker-js/faker": "^10.4.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.5.0",
+    "morgan": "^1.10.1",
+    "node-fetch": "^3.3.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

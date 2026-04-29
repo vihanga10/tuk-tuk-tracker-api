@@ -29,7 +29,7 @@ const stationNames = [
 
 async function seed() {
   await mongoose.connect(process.env.MONGO_URI);
-  console.log('✅ Connected to MongoDB');
+  console.log('Connected to MongoDB');
 
   // Clear all existing data
   await Promise.all([
@@ -38,18 +38,18 @@ async function seed() {
     Vehicle.deleteMany(),       User.deleteMany(),
     LocationPing.deleteMany()
   ]);
-  console.log('🗑️  Cleared existing data');
+  console.log('Cleared existing data');
 
   // Seed Provinces
   const provinces = await Province.insertMany(provinceData);
   const provMap   = Object.fromEntries(provinces.map(p => [p.name, p._id]));
-  console.log(`✅ ${provinces.length} provinces seeded`);
+  console.log(`${provinces.length} provinces seeded`);
 
   // Seed Districts
   const districts = await District.insertMany(
     districtData.map(d => ({ name: d.name, code: d.code, province: provMap[d.provinceName] }))
   );
-  console.log(`✅ ${districts.length} districts seeded`);
+  console.log(`${districts.length} districts seeded`);
 
   // Seed Police Stations
   const stations = await PoliceStation.insertMany(
@@ -62,11 +62,11 @@ async function seed() {
       };
     })
   );
-  console.log(`✅ ${stations.length} stations seeded`);
+  console.log(`${stations.length} stations seeded`);
 
   // Seed HQ Admin User
   await User.create({ username: 'hq_admin', password: 'Admin@123', role: 'hq_admin' });
-  console.log('✅ Admin user created  →  username: hq_admin  password: Admin@123');
+  console.log('Admin user created  →  username: hq_admin  password: Admin@123');
 
   // Seed 200 Drivers + Vehicles + Device Users
   const drivers = await Driver.insertMany(
@@ -87,7 +87,7 @@ async function seed() {
     const dist       = districts[i % districts.length];
     const { lat, lng } = randomCoord();
     vehicleDocs.push({
-      registrationNumber: `${['WP','CP','SP','NP','EP'][i % 5]}-${faker.number.int({ min: 1000, max: 9999 })}`,
+      registrationNumber: `${['WP','CP','SP','NP','EP'][i % 5]}-${String(i + 1).padStart(4, '0')}`,
       driver:      drivers[i]._id,
       deviceId,
       status:      'active',
@@ -102,11 +102,15 @@ async function seed() {
   }
 
   const vehicles = await Vehicle.insertMany(vehicleDocs);
-  await User.insertMany(deviceUsers);
-  console.log('✅ 200 drivers, vehicles and device users seeded');
+
+  // Save device users one by one so pre-save hook hashes passwords
+  for (const u of deviceUsers) {
+    await User.create(u);
+  }
+  console.log('200 drivers, vehicles and device users seeded');
 
   // Seed 7 Days Location History for first 20 vehicles
-  console.log('⏳ Generating 7 days location history...');
+  console.log('Generating 7 days location history...');
   const now          = new Date();
   const INTERVAL_MIN = 5;
   const totalSteps   = (7 * 24 * 60) / INTERVAL_MIN;
@@ -137,11 +141,11 @@ async function seed() {
   const BATCH = 5000;
   for (let b = 0; b < pings.length; b += BATCH) {
     await LocationPing.insertMany(pings.slice(b, b + BATCH));
-    console.log(`  📍 Inserted ${Math.min(b + BATCH, pings.length)} / ${pings.length} pings`);
+    console.log(`Inserted ${Math.min(b + BATCH, pings.length)} / ${pings.length} pings`);
   }
 
-  console.log('\n🎉 Seeding complete!');
-  console.log('🔑 Login → username: hq_admin  password: Admin@123');
+  console.log('\nSeeding complete!');
+  console.log('Login → username: hq_admin  password: Admin@123');
   mongoose.disconnect();
 }
 

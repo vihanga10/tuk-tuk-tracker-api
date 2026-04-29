@@ -7,6 +7,14 @@ export const getProvinces = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+export const getProvince = async (req, res, next) => {
+  try {
+    const province = await Province.findById(req.params.id);
+    if (!province) return res.status(404).json({ success: false, message: 'Province not found' });
+    res.json({ success: true, data: province });
+  } catch (err) { next(err); }
+};
+
 export const createProvince = async (req, res, next) => {
   try {
     const province = await Province.create(req.body);
@@ -14,9 +22,20 @@ export const createProvince = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+export const updateProvince = async (req, res, next) => {
+  try {
+    const province = await Province.findByIdAndUpdate(req.params.id, req.body, {
+      new: true, runValidators: true
+    });
+    if (!province) return res.status(404).json({ success: false, message: 'Province not found' });
+    res.json({ success: true, data: province });
+  } catch (err) { next(err); }
+};
+
 export const deleteProvince = async (req, res, next) => {
   try {
-    await Province.findByIdAndDelete(req.params.id);
+    const province = await Province.findByIdAndDelete(req.params.id);
+    if (!province) return res.status(404).json({ success: false, message: 'Province not found' });
     res.json({ success: true, message: 'Province deleted' });
   } catch (err) { next(err); }
 };

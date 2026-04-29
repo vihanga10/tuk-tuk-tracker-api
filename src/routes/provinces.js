@@ -1,5 +1,8 @@
 import express from 'express';
-import { getProvinces, createProvince, deleteProvince } from '../controllers/provinceController.js';
+import {
+  getProvinces, getProvince, createProvince,
+  updateProvince, deleteProvince
+} from '../controllers/provinceController.js';
 import protect from '../middleware/auth.js';
 import authorize from '../middleware/authorize.js';
 
@@ -14,7 +17,7 @@ router.use(protect);
  *     tags: [Provinces]
  *     responses:
  *       200:
- *         description: List of provinces
+ *         description: List of all provinces
  *   post:
  *     summary: Create a province (hq_admin only)
  *     tags: [Provinces]
@@ -36,11 +39,51 @@ router.use(protect);
  *       201:
  *         description: Province created
  */
-router.route('/').get(getProvinces).post(authorize('hq_admin'), createProvince);
+router.route('/')
+  .get(getProvinces)
+  .post(authorize('hq_admin'), createProvince);
 
 /**
  * @swagger
  * /provinces/{id}:
+ *   get:
+ *     summary: Get a single province by ID
+ *     tags: [Provinces]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Province data
+ *       404:
+ *         description: Province not found
+ *   put:
+ *     summary: Update a province (hq_admin only)
+ *     tags: [Provinces]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Western Province
+ *               code:
+ *                 type: string
+ *                 example: WP
+ *     responses:
+ *       200:
+ *         description: Province updated
  *   delete:
  *     summary: Delete a province (hq_admin only)
  *     tags: [Provinces]
@@ -54,6 +97,9 @@ router.route('/').get(getProvinces).post(authorize('hq_admin'), createProvince);
  *       200:
  *         description: Province deleted
  */
-router.delete('/:id', authorize('hq_admin'), deleteProvince);
+router.route('/:id')
+  .get(getProvince)
+  .put(authorize('hq_admin'), updateProvince)
+  .delete(authorize('hq_admin'), deleteProvince);
 
 export default router;

@@ -141,6 +141,13 @@ console.log('Admin, Provincial Admin and Station Officer created');
 
     for (let s = 0; s < totalSteps; s++) {
       const timestamp = new Date(now.getTime() - (totalSteps - s) * INTERVAL_MIN * 60000);
+
+// Simulate realistic pattern:
+// Day (6am-10pm)   → full movement
+// Night (10pm-6am) → 80% chance to skip (less movement)
+const hour = timestamp.getHours();
+const isNightTime = hour >= 22 || hour < 6;
+if (isNightTime && Math.random() < 0.80) continue;
       lat = Math.max(SL_BOUNDS.minLat, Math.min(SL_BOUNDS.maxLat, lat + (Math.random() - 0.5) * 0.002));
       lng = Math.max(SL_BOUNDS.minLng, Math.min(SL_BOUNDS.maxLng, lng + (Math.random() - 0.5) * 0.002));
       pings.push({

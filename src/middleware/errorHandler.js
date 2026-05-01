@@ -12,6 +12,10 @@ const errorHandler = (err, req, res, next) => {
     message = Object.values(err.errors).map(e => e.message).join(', ');
     status  = 400;
   }
+  if (err.name === 'CastError') {
+    message = `Invalid ${err.path}: ${err.value}`;
+    status  = 400;
+  }
   res.status(status).json({ success: false, message });
 };
 

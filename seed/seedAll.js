@@ -66,7 +66,25 @@ async function seed() {
 
   // Seed HQ Admin User
   await User.create({ username: 'hq_admin', password: 'Admin@123', role: 'hq_admin' });
-  console.log('Admin user created  →  username: hq_admin  password: Admin@123');
+  // Provincial Admin
+await User.create({
+  username: 'provincial_admin_wp',
+  password: 'Provincial@123',
+  role: 'provincial_admin',
+  province: provinces[0]._id  // Western Province
+});
+
+// Station Officer
+await User.create({
+  username: 'station_officer_01',
+  password: 'Officer@123',
+  role: 'station_officer',
+  province:      provinces[0]._id,
+  district:      districts[0]._id,
+  policeStation: stations[0]._id
+});
+
+console.log('Admin, Provincial Admin and Station Officer created');
 
   // Seed 200 Drivers + Vehicles + Device Users
   const drivers = await Driver.insertMany(

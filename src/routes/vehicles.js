@@ -1,30 +1,57 @@
 import express from 'express';
+import { body } from 'express-validator';
 import {
   getVehicles, getVehicle, createVehicle,
   updateVehicle, deleteVehicle, getCurrentLocation
 } from '../controllers/vehicleController.js';
 import protect from '../middleware/auth.js';
 import authorize from '../middleware/authorize.js';
+import validate from '../middleware/validate.js';
 
 const router = express.Router();
 router.use(protect);
+
+const vehicleValidation = [
+  body('registrationNumber').notEmpty().withMessage('Registration number is required'),
+  body('driver').notEmpty().withMessage('Driver ID is required'),
+  body('deviceId').notEmpty().withMessage('Device ID is required'),
+  validate
+];
 
 /**
  * @swagger
  * /vehicles:
  *   get:
- *     summary: Get all registered tuk-tuks (filter by district, status)
+ *     summary: Get all registered tuk-tuks
  *     tags: [Vehicles]
  *     parameters:
  *       - in: query
  *         name: district
  *         schema:
  *           type: string
+ *         description: Filter by district ID
+ *       - in: query
+ *         name: province
+ *         schema:
+ *           type: string
+ *         description: Filter by province ID
  *       - in: query
  *         name: status
  *         schema:
  *           type: string
  *           enum: [active, inactive, suspended]
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [createdAt, registrationNumber, status]
+ *           default: createdAt
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
  *       - in: query
  *         name: page
  *         schema:
@@ -38,8 +65,19 @@ router.use(protect);
  *     responses:
  *       200:
  *         description: List of vehicles
+ *         headers:
+ *           X-Total-Count:
+ *             description: Total number of vehicles matching filter
+ *             schema:
+ *               type: integer
+ *           ETag:
+ *             description: Entity tag for conditional GET
+ *             schema:
+ *               type: string
+ *       304:
+ *         description: Not Modified (ETag matched)
  *   post:
- *     summary: Register a new tuk-tuk
+ *     summary: Register a new tuk-tuk (hq_admin or provincial_admin)
  *     tags: [Vehicles]
  *     requestBody:
  *       required: true
@@ -54,6 +92,7 @@ router.use(protect);
  *                 example: WP-1234
  *               driver:
  *                 type: string
+ *                 example: 64f1a2b3c4d5e6f7a8b9c0d1
  *               deviceId:
  *                 type: string
  *                 example: DEV0001
@@ -62,10 +101,12 @@ router.use(protect);
  *     responses:
  *       201:
  *         description: Vehicle registered
+ *       400:
+ *         description: Validation error
  */
 router.route('/')
   .get(getVehicles)
-  .post(authorize('hq_admin', 'provincial_admin'), createVehicle);
+  .post(authorize('hq_admin', 'provincial_admin'), vehicleValidation, createVehicle);
 
 /**
  * @swagger
@@ -102,6 +143,8 @@ router.route('/')
  *               status:
  *                 type: string
  *                 enum: [active, inactive, suspended]
+ *               homeDistrict:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Vehicle updated
@@ -127,7 +170,7 @@ router.route('/:id')
  * @swagger
  * /vehicles/{id}/location/current:
  *   get:
- *     summary: Get current live location of a tuk-tuk
+ *     summary: Get real-time current location of a tuk-tuk
  *     tags: [Vehicles]
  *     parameters:
  *       - in: path
@@ -137,7 +180,14 @@ router.route('/:id')
  *           type: string
  *     responses:
  *       200:
- *         description: Current GPS coordinates
+ *         description: Current GPS coordinates and last ping time
+ *         headers:
+ *           Cache-Control:
+ *             description: no-store — always fresh
+ *             schema:
+ *               type: string
+ *       404:
+ *         description: Vehicle not found
  */
 router.get('/:id/location/current', getCurrentLocation);
 

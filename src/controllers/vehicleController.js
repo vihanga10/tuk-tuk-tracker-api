@@ -2,16 +2,43 @@ import Vehicle from '../models/Vehicle.js';
 
 export const getVehicles = async (req, res, next) => {
   try {
-    const { district, status, page = 1, limit = 20 } = req.query;
+    const {
+      district, status, province,
+      sort = 'createdAt', order = 'desc',
+      page = 1, limit = 20
+    } = req.query;
+
     const filter = {};
     if (district) filter.homeDistrict = district;
+    if (province) filter['homeDistrict.province'] = province;
     if (status)   filter.status = status;
+
+    // Scope: station_officer only sees their district
+    if (req.user.role === 'station_officer' && req.user.district) {
+      filter.homeDistrict = req.user.district;
+    }
+
+    const sortObj = { [sort]: order === 'desc' ? -1 : 1 };
+
     const vehicles = await Vehicle.find(filter)
       .populate('driver', 'fullName nic phone')
       .populate('homeDistrict', 'name')
-      .limit(+limit).skip((+page - 1) * +limit);
+      .sort(sortObj)
+      .limit(+limit)
+      .skip((+page - 1) * +limit);
+
     const total = await Vehicle.countDocuments(filter);
-    res.json({ success: true, count: vehicles.length, total, data: vehicles });
+
+    const etag = `"vehicles-${total}-${page}-${sort}-${order}"`;
+    if (req.headers['if-none-match'] === etag) {
+      return res.status(304).end();
+    }
+
+    res.setHeader('ETag', etag);
+    res.setHeader('X-Total-Count', total);
+    res.setHeader('Cache-Control', 'private, max-age=15');
+
+    res.json({ success: true, count: vehicles.length, total, page: +page, data: vehicles });
   } catch (err) { next(err); }
 };
 
@@ -54,6 +81,8 @@ export const getCurrentLocation = async (req, res, next) => {
     const vehicle = await Vehicle.findById(req.params.id)
       .select('registrationNumber currentLocation');
     if (!vehicle) return res.status(404).json({ success: false, message: 'Vehicle not found' });
+
+    res.setHeader('Cache-Control', 'no-store');
     res.json({ success: true, data: vehicle });
   } catch (err) { next(err); }
 };

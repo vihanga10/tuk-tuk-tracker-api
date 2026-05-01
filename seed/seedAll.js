@@ -64,25 +64,38 @@ async function seed() {
   );
   console.log(`${stations.length} stations seeded`);
 
-  // Seed HQ Admin User
-  await User.create({ username: 'hq_admin', password: 'Admin@123', role: 'hq_admin' });
-  // Provincial Admin
+  // HQ Admin — 1 user
 await User.create({
-  username: 'provincial_admin_wp',
-  password: 'Provincial@123',
-  role: 'provincial_admin',
-  province: provinces[0]._id  // Western Province
+  username: 'hq_admin',
+  password: 'Admin@123',
+  role: 'hq_admin'
 });
+console.log(' HQ Admin created');
 
-// Station Officer
-await User.create({
-  username: 'station_officer_01',
-  password: 'Officer@123',
-  role: 'station_officer',
-  province:      provinces[0]._id,
-  district:      districts[0]._id,
-  policeStation: stations[0]._id
-});
+// Provincial Admins — 1 per province (9 total)
+const provinceCodes = ['WP','CP','SP','NP','EP','NWP','NCP','UP','SGP'];
+for (let i = 0; i < provinces.length; i++) {
+  await User.create({
+    username: `provincial_admin_${provinceCodes[i].toLowerCase()}`,
+    password: 'Provincial@123',
+    role:     'provincial_admin',
+    province: provinces[i]._id
+  });
+}
+console.log(` ${provinces.length} provincial admin users created`);
+
+// Station Officers — 1 per station (25 total)
+for (let i = 0; i < stations.length; i++) {
+  await User.create({
+    username:      `station_officer_${String(i + 1).padStart(2, '0')}`,
+    password:      'Officer@123',
+    role:          'station_officer',
+    province:      stations[i].province,
+    district:      stations[i].district,
+    policeStation: stations[i]._id
+  });
+}
+console.log(` ${stations.length} station officer users created`);
 
 console.log('Admin, Provincial Admin and Station Officer created');
 

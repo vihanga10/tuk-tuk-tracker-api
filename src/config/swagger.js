@@ -22,40 +22,31 @@ const options = {
       title: 'Sri Lanka Police – Tuk-Tuk Tracking API',
       version: '1.0.0',
       description: `
-## Sri Lanka Police Real-Time Tuk-Tuk Tracking System
-
+## 
 A centralized RESTful API for real-time GPS tracking and movement logging 
 of registered three-wheelers across Sri Lanka.
 
 ### User Roles & Access Control
-| Role | Description | Access |
-|------|-------------|--------|
-| **hq_admin** | Police Headquarters | Full system access |
-| **provincial_admin** | Provincial offices | Province-scoped management |
-| **station_officer** | Police stations | Read-only, district-scoped |
-| **device** | GPS tracking device | POST location pings only |
+| Role | Description | 
+|------|-------------|
+| **hq_admin** | Police Headquarters | 
+| **provincial_admin** | Provincial offices | 
+| **station_officer** | Police stations | 
+| **device** | GPS tracking device | 
 
-### How To Authenticate
-1. Call **POST /auth/login** with credentials below
-2. Copy the **token** from the response
-3. Click the **🔒 Authorize** button at top right
-4. Enter: \`Bearer <your_token>\`
 
 ### Test Credentials
-| Role | Username | Password |
+|Role |Username |Password |
 |------|----------|---------|
-| HQ Admin | \`hq_admin\` | \`Admin@123\` |
-| Provincial Admin | \`provincial_admin_wp\` | \`Provincial@123\` |
-| Station Officer | \`station_officer_01\` | \`Officer@123\` |
-| Device | \`dev0001\` | \`Device@0001\` |
+|HQ Admin |hq_admin | Admin@123 |
+|Provincial Admin (Western) |provincial_admin_wp |Provincial@123 |
+|Provincial Admin (Central) |provincial_admin_cp |Provincial@123 |
+|Station Officer 01 |station_officer_01 |Officer@123 |
+|Station Officer 02 |station_officer_02 |Officer@123 |
+|Device |dev0001 |Device@0001 |
 
-### Key Features
-- Real-time GPS location tracking
-- 7-day historical movement logs
-- Province & district-wise filtering
-- Role-based access control (RBAC)
-- ETag / Conditional GET support
-- Rate limiting & request ID tracking
+
+
       `
     },
     servers,

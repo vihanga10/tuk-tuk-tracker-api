@@ -1,4 +1,5 @@
 import Vehicle from '../models/Vehicle.js';
+import District from '../models/District.js';
 
 export const getVehicles = async (req, res, next) => {
   try {
@@ -10,7 +11,10 @@ export const getVehicles = async (req, res, next) => {
 
     const filter = {};
     if (district) filter.homeDistrict = district;
-    if (province) filter['homeDistrict.province'] = province;
+    if (province) {
+  const districtIds = await District.find({ province }).distinct('_id');
+  filter.homeDistrict = { $in: districtIds };
+}
     if (status)   filter.status = status;
 
     // Scope: station_officer only sees their district

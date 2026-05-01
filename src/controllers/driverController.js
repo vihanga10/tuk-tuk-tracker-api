@@ -18,7 +18,7 @@ export const getDrivers = async (req, res, next) => {
     const total = await Driver.countDocuments(filter);
 
     // Conditional GET — ETag support
-    const etag = `"drivers-${total}-${page}"`;
+    const etag = `"drivers-${total}-${page}-${sort}-${order}-${limit}-${search || ''}"`;
     if (req.headers['if-none-match'] === etag) {
       return res.status(304).end();
     }

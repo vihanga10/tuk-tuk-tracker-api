@@ -5,7 +5,7 @@ import {
 } from '../controllers/authController.js';
 import protect from '../middleware/auth.js';
 import authorize from '../middleware/authorize.js';
-import { authLimiter } from '../middleware/rateLimiter.js';
+
 
 const router = express.Router();
 
@@ -36,7 +36,7 @@ const router = express.Router();
  *       401:
  *         description: Invalid credentials
  */
-router.post('/login', authLimiter, login);
+router.post('/login', login);
 
 /**
  * @swagger

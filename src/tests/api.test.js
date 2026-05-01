@@ -32,7 +32,6 @@ let adminToken       = null;
 let provincialToken  = null;
 let officerToken     = null;
 let deviceToken      = null;
-let createdVehicleId = null;
 let createdDriverId  = null;
 let provinceId       = null;
 let districtId       = null;
@@ -229,13 +228,11 @@ async function runTests() {
 
   await test('Stations', 'GET /stations?district= filters by district', async () => {
     const res  = await req('GET', `/stations?district=${districtId}`, null, adminToken);
-    const data = await res.json();
     if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
   });
 
   await test('Stations', 'GET /stations?province= filters by province', async () => {
     const res  = await req('GET', `/stations?province=${provinceId}`, null, adminToken);
-    const data = await res.json();
     if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
   });
 
@@ -273,7 +270,6 @@ async function runTests() {
 
   await test('Drivers', 'GET /drivers?search= filters by name', async () => {
     const res  = await req('GET', '/drivers?search=a&limit=5', null, adminToken);
-    const data = await res.json();
     if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
   });
 
@@ -351,7 +347,6 @@ async function runTests() {
 
   await test('Vehicles', 'GET /vehicles?sort=registrationNumber&order=asc sorts correctly', async () => {
     const res  = await req('GET', '/vehicles?sort=registrationNumber&order=asc&limit=5', null, adminToken);
-    const data = await res.json();
     if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
   });
 
@@ -415,7 +410,6 @@ async function runTests() {
 
   await test('Locations', 'GET /locations/live?district= filters by district', async () => {
     const res  = await req('GET', `/locations/live?district=${districtId}`, null, adminToken);
-    const data = await res.json();
     if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
   });
 
@@ -449,13 +443,11 @@ async function runTests() {
 
   await test('Locations', 'GET /locations/history?province= filters by province', async () => {
     const res  = await req('GET', `/locations/history?province=${provinceId}&limit=5`, null, adminToken);
-    const data = await res.json();
     if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
   });
 
   await test('Locations', 'GET /locations/history?district= filters by district', async () => {
     const res  = await req('GET', `/locations/history?district=${districtId}&limit=5`, null, adminToken);
-    const data = await res.json();
     if (res.status !== 200) throw new Error(`Expected 200, got ${res.status}`);
   });
 

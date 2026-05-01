@@ -2,6 +2,7 @@ import express from 'express';
 import { submitPing, getLocationHistory, getLiveLocations } from '../controllers/locationController.js';
 import protect from '../middleware/auth.js';
 import authorize from '../middleware/authorize.js';
+import { pingLimiter } from '../middleware/rateLimiter.js';
 
 const router = express.Router();
 
@@ -40,7 +41,7 @@ const router = express.Router();
  *       404:
  *         description: Device not registered
  */
-router.post('/ping', protect, authorize('device'), submitPing);
+router.post('/ping', protect, authorize('device'), pingLimiter, submitPing);
 
 /**
  * @swagger
@@ -83,9 +84,28 @@ router.post('/ping', protect, authorize('device'), submitPing);
  *         schema:
  *           type: integer
  *           default: 100
+ *       - in: query
+ *         name: sort
+ *         schema:
+ *           type: string
+ *           enum: [timestamp, speed]
+ *           default: timestamp
+ *         description: Field to sort by
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort direction
  *     responses:
  *       200:
  *         description: Location history records
+ *         headers:
+ *           X-Total-Count:
+ *             description: Total number of matching records
+ *             schema:
+ *               type: integer
  */
 router.get('/history', protect, getLocationHistory);
 
@@ -101,9 +121,23 @@ router.get('/history', protect, getLocationHistory);
  *         schema:
  *           type: string
  *         description: Filter by district ID
+ *       - in: query
+ *         name: province
+ *         schema:
+ *           type: string
+ *         description: Filter by province ID
  *     responses:
  *       200:
  *         description: Live locations of all active vehicles
+ *         headers:
+ *           X-Total-Count:
+ *             description: Total number of active vehicles
+ *             schema:
+ *               type: integer
+ *           Cache-Control:
+ *             description: no-store — always fresh data
+ *             schema:
+ *               type: string
  */
 router.get('/live', protect, getLiveLocations);
 
